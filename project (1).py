@@ -1,60 +1,74 @@
-import numpy as np
-import control
-import matplotlib.pyplot as plt
-from spb import plot_impulse_response
-from numpy import exp
-#unit ramp response curve for GH
+#This project will simulate the dynamic systems by using transfer function in s
 
-# for TransferFunction
-s = control.tf(' s ')
-num = list(map(float,np.array(input('num = ').split())))
-den =list(map(float,np.array(input(' den= ').split())))
-control.tf(num, den)
-GH = control.tf(num,den)
-print('G(s) = ', GH)
+# Import the packages needed 
+import numpy as np # is used for plotting
+from control import * # using propertis in control like tf
+import matplotlib.pyplot as plt # using toolbox matlab
+import pandas as pd # collecting data at the end
 
-H = 1 
-print('H(s) = ', H)
+# first make a transfer function or G(s) 
+# in here we have unity feedback ,so H(s) is equal one
+# make a open loop and closed loop transfer function then calculate steady state error 
+# plotting all of them in terms of time
 
-#closed loop transfer function
-closed_loop_TF =control.feedback(GH,H)
-print('closed_loop_TF = ', closed_loop_TF)
+# Enter the num and den of G(s)
+s = tf('s') # in s
+num = list(map(float,input('num=').split())) # numerator in s
+den =list(map(float,input('den=').split())) # denumator in s
 
-start = 0
-stop = 20
-increment  = 0.5
-t = np.arange(start,stop,increment)
-t, y = control.step_response(closed_loop_TF, t)
-step_in = 1*np.ones(len(t))
+#feedback transfer function
+H = 1 # unity feedback
+print('H(s)={}'.format(H))
 
-plt.figure(1)
+#open loop transfer function
+GH = tf(num,den) # make a open loop tf between G(S) and H(s)
+print(f'G(s)=', GH)
+
+#closed loop transfer function(feedback control system)
+closed_loop_TF =feedback(GH, H) # make a closed loop tf with feedback function
+print(closed_loop_TF)
+
+
+# plotting responce in t
+t = np.arange(0, 20, 0.5)
+
+#axis_one
+t, y = step_response(closed_loop_TF, t)
+black_line = np.ones(len(t))
+
+plt.figure(1) # make a page
 plt.subplot(1,2,1)
 plt.plot(t,y,label='unit step input')
 plt.xlabel('Time [seconds]')
 plt.ylabel('Output')
 plt.title('Closed-Loop Step Response')
-plt.plot(t,step_in,'r--',color='black')
-plt.legend()
-plt.grid(True)
-
-error = abs(1 - y[-1])
-t,error = control.impulse_response(GH,t)
-print(error)
-
-plt.subplot(1,2,2)
-plt.plot(t,error,color='red',linewidth=1)
-plt.xlabel('Time [second]')
-plt.ylabel('Error')
-plt.legend()
+plt.plot(t,black_line ,'r--' ,color='black' )
 plt.grid(True)
 
 start = 0
 stop = 20
 increment  = 0.5
 t = np.arange(start,stop,increment)
+
+# axis_two
 u = t
-t, y = control.forced_response(GH,T=t,U=u)
+t, y = impulse_response(GH,T=t)
 error = u - y
+
+plt.subplot(1,2,2)
+plt.plot(t,y,color='red',linewidth=1)
+plt.xlabel('Time [second]')
+plt.ylabel('Error')
+plt.grid(True)
+
+start = 0
+stop = 20
+increment  = 0.5
+t = np.arange(start,stop,increment)
+u = (t)
+t, y = forced_response(GH,T=t,U=u)
+error = t - y
+step_on = np.zeros(len(t))
 
 plt.figure(2)
 plt.subplot(1,2,1)
@@ -62,8 +76,8 @@ plt.plot(t,y,label='unit ramp input')
 plt.xlabel('time[seccond]')
 plt.ylabel('output')
 plt.title('unit ramp')
+plt.plot(t,step_on)
 plt.grid(True)
-plt.legend()
 
 plt.subplot(1,2,2)
 plt.plot(t, error, color= 'red')
@@ -71,9 +85,13 @@ plt.xlabel('time')
 plt.ylabel('output')
 plt.title('ess')
 plt.grid(True)
-plt.legend()
 
 plt.show()
+
+
+
+
+
 
 
 
