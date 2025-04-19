@@ -4,7 +4,6 @@
 import numpy as np # is used for plotting
 from control import * # using propertis in control like tf
 import matplotlib.pyplot as plt # using toolbox matlab
-import pandas as pd # collecting data at the end
 
 # first make a transfer function or G(s) 
 # in here we have unity feedback ,so H(s) is equal one
